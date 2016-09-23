@@ -9,6 +9,10 @@ class InvoicePayment(models.Model):
 
     @api.multi
     def _payment_block(self):
+        if len(self) != 1:
+            for r in self:
+                r.payment_options = ''
+            return
         self.ensure_one()
         payment_acquirer = self.env['payment.acquirer']
 

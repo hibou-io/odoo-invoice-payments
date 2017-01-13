@@ -21,7 +21,7 @@ class InvoicePayment(models.Model):
             payment_options = ''
             for acquirer in payment_acquirers:
                 reference = self.number + '-by-' + str(acquirer.id)
-                amount = self.residual
+                amount = self._get_auth_amount(acquirer.id)
                 txn = PaymentTransaction.search([('reference', '=', reference)])
                 values = {
                     'amount': amount,
@@ -40,7 +40,7 @@ class InvoicePayment(models.Model):
 
                 payment_options += acquirer.sudo().render(
                     reference,
-                    self.residual,
+                    amount,
                     self.currency_id.id,
                     partner_id=self.partner_id.id)
 
@@ -48,3 +48,12 @@ class InvoicePayment(models.Model):
         else:
             self.payment_options = ''
         return self.payment_options
+
+    def _get_auth_amount(self, id):
+        config = self.env['ir.config_parameter'].sudo()
+        key = 'payment.auth.amount.' + str(id)
+
+        amount_config = config.search([('key', '=', key)])
+        if not amount_config:
+            amount_config = config.create({'key': key, 'value': '0.00'})
+        return float(amount_config.value)

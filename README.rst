@@ -1,6 +1,6 @@
-******************************
-Hibou - Ivoice Payments for v9
-******************************
+*******************************
+Hibou - Invoice Payments for v9
+*******************************
 
 Provides a way to get buttons to pay invoices using configured payment acquirers.
 
